@@ -34,13 +34,24 @@ struct dataFromNRF {
   bool returnHome;
 };
 
+// struct dataToNRF {
+//   float lat;
+//   float lon;
+//   float heading;
+//   float velocity;
+//   int numWaypoints;
+//   float battery;
+//   float sonic;
+// };
+
 struct dataToNRF {
-  float lat;
-  float lon;
-  float heding;
+  double lat;
+  double lon;
+  double heading;
+  double velocity;
   int numWaypoints;
-  float battery;
-  float sonic;
+  double battery;
+  double sonic;
 };
 
 #endif //__DATA_HPP

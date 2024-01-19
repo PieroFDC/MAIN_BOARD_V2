@@ -13,6 +13,7 @@
 #include "data.hpp"
 #include "serialcom.hpp"
 #include "nrf24com.hpp"
+#include "utils.hpp"
 // #include "battery.hpp"
 // #include "ultrasonic.hpp"
 

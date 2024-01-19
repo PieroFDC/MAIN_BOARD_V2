@@ -10,22 +10,8 @@ std::vector<double> nullVector(4, -999.0);
 TinyGPSPlus gps;
 HardwareSerial Serial2(USART2);
 
-// const unsigned char UBLOX_INIT[] PROGMEM = {
-//   0xB5,0x62,0x06,0x08,0x06,0x00,0xC8,0x00,0x01,0x00,0x01,0x00,0xDE,0x6A, //(5Hz)
-// };
-
-// ///
-// const unsigned char ubxRate5Hz[] PROGMEM =
-//   { 0x06,0x08,0x06,0x00,200,0x00,0x01,0x00,0x01,0x00 };
-// ///
-
 void gpsSetup() {
-    // Serial2.begin(9600);
     Serial2.begin(230400);
-    
-    // for(unsigned int i = 0; i < sizeof(UBLOX_INIT); i++) {                        
-    //     Serial2.write( pgm_read_byte(UBLOX_INIT+i) );
-    // }
 }
 
 std::vector<double> gpsRead() {

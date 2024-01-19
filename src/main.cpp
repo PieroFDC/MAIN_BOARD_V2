@@ -7,8 +7,7 @@ void setup() {
     Wire.begin();
     Wire.setClock(400000);
 
-    attachInterrupt(IRQ_PIN, interruptNRF, FALLING);
-
+    radioSetup();
     initESC();
     gimbalSetup();
     gpsSetup();
@@ -18,6 +17,15 @@ void setup() {
 } 
 
 void loop() {
+    if(newRadioData) {
+        parseData(RXdata, dataFromNRFStruct);
+        newRadioData = false;
+        Serial.print("Mode: ");
+        Serial.println(dataFromNRFStruct.mode);
+        Serial.print("PWML: ");
+        Serial.println(dataFromNRFStruct.pwml);
+    }
+
     // ultrasonic Handle
     // dataToPcStruct.sonic = ultrasonicRead();
     dataToPcStruct.sonic = 10;
@@ -58,9 +66,36 @@ void loop() {
     // NRF Handle
     dataToPcStruct.nrf = "nrf";
 
-    serialCom.replyToPC(dataToPcStruct);
-}
+    serialCom.replyToPC(dataToPcStruct); 
 
-void interruptNRF() {
-    dataFromNRFStruct = radioRX();
+
+    // Data To NRF
+    dataToNRFStruct.lat = dataToPcStruct.lat;
+    dataToNRFStruct.lon = dataToPcStruct.lon;
+    dataToNRFStruct.heading = dataToPcStruct.yaw;
+    dataToNRFStruct.velocity = dataToPcStruct.velocity;
+    dataToNRFStruct.numWaypoints = 0; //
+    dataToNRFStruct.battery = dataToPcStruct.volt;
+    dataToNRFStruct.sonic = dataToPcStruct.sonic;
+
+    Serial.print("datastruct: ");
+    Serial.println(dataToNRFStruct.lat, 6);
+
+    // Send To NRF
+    // structToString(dataToNRFStruct, TXdata);
+    String res = "<" + String(dataToNRFStruct.lat) + String(dataToNRFStruct.lon) + ">";
+    Serial.println(res);
+
+    sprintf(TXdata, "<%d,%lf,%lf,%lf,%d,%lf,%lf>", 
+            dataToNRFStruct.lat, dataToNRFStruct.lon, dataToNRFStruct.heading, dataToNRFStruct.velocity, 
+            dataToNRFStruct.numWaypoints, dataToNRFStruct.battery, dataToNRFStruct.sonic);
+
+
+    bool rslt = radioTX();
+    if(rslt) {
+        Serial.print("nrf: ");
+        Serial.println(TXdata);
+    } else {
+        Serial.println("Error al enviar los datos");
+    }
 }

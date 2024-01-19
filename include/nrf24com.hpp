@@ -10,66 +10,46 @@
 
 #define IRQ_PIN PB0
 
-//Variable con la dirección del canal que se va a leer
-uint8_t address[] = { 0xAB, 0x8F, 0xDE, 0x9C, 0x37 };
+const byte Address[2][5] = {{ 0xAB, 0x8F, 0xDE, 0x9C, 0x37 }, { 0xAB, 0x8F, 0xDE, 0x9C, 0x38 }};
 
-//creamos el objeto radio (NRF24L01)
+
 RF24 radio(CE_PIN, CSN_PIN);
 
-//vector para los datos recibidos
-char RXdata[17];
+bool newRadioData = false;
+char RXdata[32];
+char TXdata[64];
+
+void getRadioData();
 
 void radioSetup() {
-    //inicializamos el NRF24L01 
     radio.begin();
-    radio.setAutoAck(1);
-    radio.enableAckPayload();
-    radio.maskIRQ(1, 1, 0);
+    radio.setDataRate( RF24_1MBPS );
     radio.setPALevel(RF24_PA_HIGH);
 
-    //Abrimos el canal de Lectura
-    radio.openReadingPipe(1, address);
-    
-    //empezamos a escuchar por el canal
+    radio.openWritingPipe(Address[0]);
+    radio.openReadingPipe(1, Address[1]);
+
+    radio.maskIRQ(1, 1, 0);
+    attachInterrupt(IRQ_PIN , getRadioData, FALLING);
     radio.startListening();
 }
 
-void radioTX(char TXdata[45]) {
+bool radioTX() {
     radio.stopListening();
-    radio.write(TXdata, sizeof(TXdata));
+    delayMicroseconds(50);
+    bool rslt = radio.write(&TXdata, sizeof(TXdata));
+    delayMicroseconds(50);
     radio.startListening();
+    delayMicroseconds(50);
+
+    return rslt;
 }
 
-dataFromNRF radioRX() {
-    dataFromNRF data;
-
+void getRadioData() {
     if (radio.available()) {    
-        radio.read(RXdata, sizeof(RXdata));
-
-        if (RXdata[0] == '<' && RXdata[sizeof(RXdata) - 1] == '>') {
-            parseData(RXdata, data);
-        }
+        radio.read(&RXdata, sizeof(RXdata));
+        newRadioData = true;
     }
-
-    return data;
-}
-
-void parseData(const char* input, dataFromNRF& result) {
-    char* token = strtok(const_cast<char*>(input), ",");
-
-    result.mode = atoi(token + 1);
-
-    token = strtok(nullptr, ",");
-    result.pwml = atoi(token);
-
-    token = strtok(nullptr, ",");
-    result.pwmr = atoi(token);
-
-    token = strtok(nullptr, ",");
-    result.startStop = atoi(token);
-
-    token = strtok(nullptr, ">");
-    result.returnHome = atoi(token);
 }
 
 #endif //__NRF24COM_HPP
