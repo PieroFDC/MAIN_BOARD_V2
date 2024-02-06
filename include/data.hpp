@@ -4,17 +4,17 @@
 #include <Arduino.h>
 
 struct dataToPc {
-  float lat;
-  float lon;
-  float velocity;
-  float course;
-  float yaw;
-  float pitch;
-  float roll;
+  double lat;
+  double lon;
+  double velocity;
+  double course;
+  double yaw;
+  double pitch;
+  double roll;
   int calibration;
   String nrf;
   int sonic;
-  float volt;
+  double volt;
   int pwml;
   int pwmr;
 };
@@ -22,7 +22,7 @@ struct dataToPc {
 struct dataFromPc {
   int fl;
   int fr;
-  float gimbalyaw;
+  double gimbalyaw;
   String nrf;
 };
 
@@ -33,16 +33,6 @@ struct dataFromNRF {
   bool startStop;
   bool returnHome;
 };
-
-// struct dataToNRF {
-//   float lat;
-//   float lon;
-//   float heading;
-//   float velocity;
-//   int numWaypoints;
-//   float battery;
-//   float sonic;
-// };
 
 struct dataToNRF {
   double lat;

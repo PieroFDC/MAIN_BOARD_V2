@@ -25,11 +25,11 @@ Filter rollFilter(20, 0.5);
 Filter courseFilter(20, 0.5);
 Filter velocityFilter(20, 0.5);
 
-dataFromPc dataFromPcStruct;
-dataToPc dataToPcStruct;
+// dataFromPc dataFromPcStruct;
+// dataToPc dataToPcStruct;
 
-dataFromNRF dataFromNRFStruct;
-dataToNRF dataToNRFStruct;
+// dataFromNRF dataFromNRFStruct;
+// dataToNRF dataToNRFStruct;
 
 std::vector<float> imuData(4);
 std::vector<double> gpsData(4);

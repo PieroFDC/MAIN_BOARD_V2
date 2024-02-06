@@ -1,38 +1,44 @@
 #ifndef __UTILS_HPP
 #define __UTILS_HPP
 
-#include "data.hpp"
+dataFromPc dataFromPcStruct;
+dataToPc dataToPcStruct;
 
-void parseData(const char* input, dataFromNRF& result) {
-    char* token = strtok(const_cast<char*>(input), ",");
+dataFromNRF dataFromNRFStruct;
+dataToNRF dataToNRFStruct;
 
-    result.mode = atoi(token + 1);
+// #include "data.hpp"
 
-    token = strtok(nullptr, ",");
-    result.pwml = atoi(token);
+// void parseData(const char* input, dataFromNRF& result) {
+//     char* token = strtok(const_cast<char*>(input), ",");
 
-    token = strtok(nullptr, ",");
-    result.pwmr = atoi(token);
+//     result.mode = atoi(token + 1);
 
-    token = strtok(nullptr, ",");
-    result.startStop = atoi(token);
+//     token = strtok(nullptr, ",");
+//     result.pwml = atoi(token);
 
-    token = strtok(nullptr, ">");
-    result.returnHome = atoi(token);
-}
+//     token = strtok(nullptr, ",");
+//     result.pwmr = atoi(token);
 
-void structToString(const dataToNRF& data, const char* result) {
-    // Formato: "<lat,lon,heading,velocity,numWaypoints,battery,sonic>"
-    String res;
+//     token = strtok(nullptr, ",");
+//     result.startStop = atoi(token);
 
-    Serial.print("datastruct: ");
-    Serial.println(data.lat);
+//     token = strtok(nullptr, ">");
+//     result.returnHome = atoi(token);
+// }
 
-    res = "<" + String(data.lat) + String(data.lon) + ">";
-    result = res.c_str();
-    //   sprintf(result, "<%.6f,%.6f,%.2f,%.2f,%d,%.2f,%.2f>", 
-    //           data.lat, data.lon, data.heading, data.velocity, 
-    //           data.numWaypoints, data.battery, data.sonic);
-}
+// void structToString(const dataToNRF& data, const char* result) {
+//     // Formato: "<lat,lon,heading,velocity,numWaypoints,battery,sonic>"
+//     String res;
+
+//     Serial.print("datastruct: ");
+//     Serial.println(data.lat);
+
+//     res = "<" + String(data.lat) + String(data.lon) + ">";
+//     result = res.c_str();
+//     //   sprintf(result, "<%.6f,%.6f,%.2f,%.2f,%d,%.2f,%.2f>", 
+//     //           data.lat, data.lon, data.heading, data.velocity, 
+//     //           data.numWaypoints, data.battery, data.sonic);
+// }
 
 #endif //__UTILS_HPP

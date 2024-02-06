@@ -1,5 +1,13 @@
 #include "main.hpp"
 
+#include <HardwareTimer.h>
+
+HardwareTimer *timer = new HardwareTimer(TIM4);
+
+void timerCallback() {
+    bool rslt = radioTX(dataToNRFStruct);
+}
+
 void setup() {
     Serial.begin(2000000);
     while (!Serial) delay(10);
@@ -14,18 +22,13 @@ void setup() {
     // adsSetup(&Wire);
     // ultrasonicSetup();
     imuSetup(&Wire);
-} 
+
+    timer->setOverflow(5, HERTZ_FORMAT);
+    timer->attachInterrupt(timerCallback);
+    timer->resume();
+}
 
 void loop() {
-    if(newRadioData) {
-        parseData(RXdata, dataFromNRFStruct);
-        newRadioData = false;
-        Serial.print("Mode: ");
-        Serial.println(dataFromNRFStruct.mode);
-        Serial.print("PWML: ");
-        Serial.println(dataFromNRFStruct.pwml);
-    }
-
     // ultrasonic Handle
     // dataToPcStruct.sonic = ultrasonicRead();
     dataToPcStruct.sonic = 10;
@@ -58,16 +61,26 @@ void loop() {
 
     gimbalLoop(dataFromPcStruct.gimbalyaw, dataToPcStruct.pitch, dataToPcStruct.roll);
 
-    escFeedback = writeESC(dataFromPcStruct.fl, dataFromPcStruct.fr);
+    if(dataFromNRFStruct.startStop) {
+        if(dataFromNRFStruct.mode) {
+            escFeedback = writeESC(dataFromPcStruct.fl, dataFromPcStruct.fr); // Auto -> Control
+        } else {
+            escFeedback = writeESC(dataFromNRFStruct.pwml, dataFromNRFStruct.pwml); // Manual -> Joystick
+        }
+    } else {
+        escFeedback = writeESC(1500, 1500); // Stop
+    }
 
     dataToPcStruct.pwml = escFeedback[0];
     dataToPcStruct.pwmr = escFeedback[1];
 
-    // NRF Handle
-    dataToPcStruct.nrf = "nrf";
+    if(dataFromNRFStruct.returnHome) {
+        dataToPcStruct.nrf = "rh"; // Return Home
+    } else {
+        dataToPcStruct.nrf = "nrf"; // Normal
+    }
 
     serialCom.replyToPC(dataToPcStruct); 
-
 
     // Data To NRF
     dataToNRFStruct.lat = dataToPcStruct.lat;
@@ -77,25 +90,4 @@ void loop() {
     dataToNRFStruct.numWaypoints = 0; //
     dataToNRFStruct.battery = dataToPcStruct.volt;
     dataToNRFStruct.sonic = dataToPcStruct.sonic;
-
-    Serial.print("datastruct: ");
-    Serial.println(dataToNRFStruct.lat, 6);
-
-    // Send To NRF
-    // structToString(dataToNRFStruct, TXdata);
-    String res = "<" + String(dataToNRFStruct.lat) + String(dataToNRFStruct.lon) + ">";
-    Serial.println(res);
-
-    sprintf(TXdata, "<%d,%lf,%lf,%lf,%d,%lf,%lf>", 
-            dataToNRFStruct.lat, dataToNRFStruct.lon, dataToNRFStruct.heading, dataToNRFStruct.velocity, 
-            dataToNRFStruct.numWaypoints, dataToNRFStruct.battery, dataToNRFStruct.sonic);
-
-
-    bool rslt = radioTX();
-    if(rslt) {
-        Serial.print("nrf: ");
-        Serial.println(TXdata);
-    } else {
-        Serial.println("Error al enviar los datos");
-    }
 }

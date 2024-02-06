@@ -85,6 +85,10 @@ public:
         SerialDevice.print(data.course, 2);
         SerialDevice.print(", Yaw: ");
         SerialDevice.print(data.yaw, 2);
+        SerialDevice.print(", Pitch: ");
+        SerialDevice.print(data.pitch, 2);
+        SerialDevice.print(", Roll: ");
+        SerialDevice.print(data.roll, 2);
         SerialDevice.print(", NRF: ");
         SerialDevice.print(data.nrf);
         SerialDevice.print(", sonic: ");
