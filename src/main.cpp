@@ -1,9 +1,5 @@
 #include "main.hpp"
 
-#include <HardwareTimer.h>
-
-HardwareTimer *timer = new HardwareTimer(TIM4);
-
 void timerCallback() {
     bool rslt = radioTX(dataToNRFStruct);
 }
@@ -30,12 +26,13 @@ void setup() {
 
 void loop() {
     // ultrasonic Handle
-    // dataToPcStruct.sonic = ultrasonicRead();
-    dataToPcStruct.sonic = 10;
+    // double sonic_read = ultrasonicRead();
+    // dataToPcStruct.sonic = ...;
+    dataToPcStruct.sonic = false;
 
     // Voltage Handle
     // dataToPcStruct.volt = adsRead();
-    dataToPcStruct.volt = 12;
+    dataToPcStruct.volt = 12.5;
 
     imuData = imuRead();
     gpsData = gpsRead();
@@ -65,7 +62,7 @@ void loop() {
         if(dataFromNRFStruct.mode) {
             escFeedback = writeESC(dataFromPcStruct.fl, dataFromPcStruct.fr); // Auto -> Control
         } else {
-            escFeedback = writeESC(dataFromNRFStruct.pwml, dataFromNRFStruct.pwml); // Manual -> Joystick
+            escFeedback = writeESC(dataFromNRFStruct.pwml, dataFromNRFStruct.pwmr); // Manual -> Joystick
         }
     } else {
         escFeedback = writeESC(1500, 1500); // Stop
@@ -90,4 +87,5 @@ void loop() {
     dataToNRFStruct.numWaypoints = 0; //
     dataToNRFStruct.battery = dataToPcStruct.volt;
     dataToNRFStruct.sonic = dataToPcStruct.sonic;
+    dataToNRFStruct.calibration = dataToPcStruct.calibration;
 }

@@ -10,7 +10,7 @@
 std::vector<float> mpuRead(4);
 
 unsigned long lastIMUReadTime;
-const unsigned long imuReadInterval = 100;
+const unsigned long imuReadInterval = 500;
 
 struct euler_t {
     float yaw;
@@ -72,6 +72,7 @@ std::vector<float> imuRead() {
 
     if (currentTime - lastIMUReadTime > imuReadInterval) {
         delay(500);
+        Serial.println(currentTime - lastIMUReadTime);
         NVIC_SystemReset();
     }
 

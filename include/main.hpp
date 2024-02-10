@@ -5,6 +5,7 @@
 #include <Servo.h>
 #include <vector>
 #include <math.h>
+#include <HardwareTimer.h>
 #include "esc.hpp"
 #include "gps.hpp"
 #include "imu.hpp"
@@ -16,6 +17,9 @@
 #include "utils.hpp"
 // #include "battery.hpp"
 // #include "ultrasonic.hpp"
+
+
+HardwareTimer *timer = new HardwareTimer(TIM4);
 
 SerialCommunication serialCom(Serial);
 

@@ -13,7 +13,7 @@ struct dataToPc {
   double roll;
   int calibration;
   String nrf;
-  int sonic;
+  bool sonic;
   double volt;
   int pwml;
   int pwmr;
@@ -41,7 +41,8 @@ struct dataToNRF {
   double velocity;
   int numWaypoints;
   double battery;
-  double sonic;
+  bool sonic;
+  int calibration;
 };
 
 #endif //__DATA_HPP

@@ -16,95 +16,121 @@ const byte Address[2][5] = {{ 0xAB, 0x8F, 0xDE, 0x9C, 0x37 }, { 0xAB, 0x8F, 0xDE
 
 RF24 radio(CE_PIN, CSN_PIN);
 
-bool newRadioData = false;
-char RXdata[32];
-char TXdata[64];
+char RXdata[128];
+char TXdata[32];
+
+String temp_string = "";
+bool waiting_for_second_part = false;
 
 void getRadioData();
 
 void radioSetup() {
-    radio.begin();
+  radio.begin();
 
-    // radio.setAutoAck(false);
-    // radio.disableAckPayload();
+  radio.setDataRate(RF24_250KBPS);
+  radio.setPALevel(RF24_PA_HIGH);
 
-    radio.setDataRate( RF24_1MBPS );
-    radio.setPALevel(RF24_PA_HIGH);
+  radio.openWritingPipe(Address[0]);
+  radio.openReadingPipe(1, Address[1]);
 
-    radio.openWritingPipe(Address[0]);
-    radio.openReadingPipe(1, Address[1]);
-
-    // radio.setRetries(0, 0);
-
-    radio.maskIRQ(1, 1, 0);
-    attachInterrupt(IRQ_PIN , getRadioData, FALLING);
-    radio.startListening();
+  radio.maskIRQ(1, 1, 0);
+  attachInterrupt(IRQ_PIN , getRadioData, FALLING);
+  radio.startListening();
 }
 
 bool radioTX(dataToNRF dataToNRFStruct) {
-    String joinDataString = "<" + String(dataToNRFStruct.lat) + "," + String(dataToNRFStruct.lon) +
-                            "," + String(dataToNRFStruct.heading) + "," + String(dataToNRFStruct.velocity) +
-                            "," + String(dataToNRFStruct.numWaypoints) + "," + String(dataToNRFStruct.battery) +
-                            "," + String(dataToNRFStruct.sonic) + ">";
+  String joinDataString = "<" + String(dataToNRFStruct.lat, 7) + "," + String(dataToNRFStruct.lon, 7) +
+                          "," + String(dataToNRFStruct.heading, 2) + "," + String(dataToNRFStruct.velocity, 2) +
+                          "," + String(dataToNRFStruct.numWaypoints) + "," + String(dataToNRFStruct.battery, 2) +
+                          "," + String(dataToNRFStruct.sonic) + "," + String(dataToNRFStruct.calibration) + ">";
 
-    joinDataString.toCharArray(TXdata, sizeof(TXdata));
+  bool rslt = false;
+
+  if (joinDataString.length() > 30) {
+    String parts[2];
+
+    parts[0] = joinDataString.substring(0, 30);
+    parts[1] = joinDataString.substring(30);
+
+    parts[0] += "|";
+    parts[1] = "|" + parts[1];
 
     radio.stopListening();
     delayMicroseconds(50);
-    bool rslt = radio.write(&TXdata, sizeof(TXdata));
-    delayMicroseconds(50);
-    radio.startListening();
-    delayMicroseconds(50);
 
-    return rslt;
+    for (int i = 0; i < 2; i++) {
+      parts[i].toCharArray(TXdata, sizeof(TXdata));
+      int data_len = parts[i].length();
+
+      rslt = radio.write(TXdata, data_len);
+    }
+  } else {
+    joinDataString.toCharArray(TXdata, sizeof(TXdata));
+    radio.stopListening();
+    delayMicroseconds(50);
+    rslt = radio.write(TXdata, sizeof(TXdata));
+  }
+
+  delayMicroseconds(50);
+  radio.startListening();
+  delayMicroseconds(50);
+
+  return rslt;
 }
-
-
 
 void parseData(const char* input, dataFromNRF& result) {
-    char* token = strtok(const_cast<char*>(input), ",");
+  char* token = strtok(const_cast<char*>(input), ",");
 
-    result.mode = atoi(token);
+  result.mode = atoi(token);
 
-    token = strtok(nullptr, ",");
-    result.pwml = atoi(token);
+  token = strtok(nullptr, ",");
+  result.pwml = atoi(token);
 
-    token = strtok(nullptr, ",");
-    result.pwmr = atoi(token);
+  token = strtok(nullptr, ",");
+  result.pwmr = atoi(token);
 
-    token = strtok(nullptr, ",");
-    result.startStop = atoi(token);
+  token = strtok(nullptr, ",");
+  result.startStop = atoi(token);
 
-    result.returnHome = atoi(token);
+  token = strtok(nullptr, ",");
+  result.returnHome = atoi(token);
 }
 
-String processString(const String &inputString) {
-  bool foundLessThan = false;
-  String contentBetweenLessGreater;
+String processString(String message) {
+  if (message.startsWith("<")) {
+    if (message.endsWith(">")) {
+      message = message.substring(1, message.length() - 1);
+      waiting_for_second_part = false;
 
-  for (unsigned int i = 0; i < inputString.length(); ++i) {
-    char currentCharacter = inputString[i];
+      return message;
+    }
 
-    if (currentCharacter == '<') {
-      if (foundLessThan) {
-        foundLessThan = false;
-        contentBetweenLessGreater = "";
-      }
+    else if (message.endsWith("|")) {
+      message = message.substring(1, message.length() - 1);
+      temp_string = message;
+      waiting_for_second_part = true;
 
-      foundLessThan = true;
+    }
 
-    } else if (currentCharacter == '>') {
-      if (foundLessThan) {
-        return contentBetweenLessGreater;
-      }
+  } else if (message.startsWith("|")) {
+    if (!waiting_for_second_part) {
+      return "";
 
-    } else if (foundLessThan) {
-      contentBetweenLessGreater += currentCharacter;
+    } else if (message.endsWith(">")) {
+      message = message.substring(1, message.length() - 1);
+      temp_string += message;
+
+      waiting_for_second_part = false;
+
+      return temp_string;
+
+    } else {
+      waiting_for_second_part = false;
     }
   }
+  
   return "";
 }
-
 
 void getRadioData() {
     String readData;
@@ -115,6 +141,7 @@ void getRadioData() {
 
         if(readData.length() > 0) {
             parseData(readData.c_str(), dataFromNRFStruct);
+            Serial.println("data received from nrf");
         }
     }
 }
