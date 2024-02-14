@@ -39,7 +39,7 @@ void imuSetup(TwoWire *wireDevice) {
     Serial.println("IMU Found!");
 
     setReports(reportType, reportIntervalUs);
-    delay(100);
+    delayMicroseconds(100);
     lastIMUReadTime = millis();
 }
 

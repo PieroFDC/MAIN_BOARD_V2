@@ -73,33 +73,33 @@ public:
 
     void replyToPC(dataToPc data) {
         if (newDataFromPC) {
-        newDataFromPC = false;
-        SerialDevice.print("<");
-        SerialDevice.print("Lat: ");
-        SerialDevice.print(data.lat, 7);
-        SerialDevice.print(", Lon: ");
-        SerialDevice.print(data.lon, 7);
-        SerialDevice.print(", Speed: ");
-        SerialDevice.print(data.velocity, 4);
-        SerialDevice.print(", Course: ");
-        SerialDevice.print(data.course, 2);
-        SerialDevice.print(", Yaw: ");
-        SerialDevice.print(data.yaw, 2);
-        SerialDevice.print(", Pitch: ");
-        SerialDevice.print(data.pitch, 2);
-        SerialDevice.print(", Roll: ");
-        SerialDevice.print(data.roll, 2);
-        SerialDevice.print(", NRF: ");
-        SerialDevice.print(data.nrf);
-        SerialDevice.print(", sonic: ");
-        SerialDevice.print(data.sonic);
-        SerialDevice.print(", volt: ");
-        SerialDevice.print(data.volt, 2);
-        SerialDevice.print(", PWML: ");
-        SerialDevice.print(data.pwml);
-        SerialDevice.print(", PWMR: ");
-        SerialDevice.print(data.pwmr);
-        SerialDevice.print(">");
+            newDataFromPC = false;
+            SerialDevice.print("<");
+            SerialDevice.print("Lat: ");
+            SerialDevice.print(data.lat, 7);
+            SerialDevice.print(", Lon: ");
+            SerialDevice.print(data.lon, 7);
+            SerialDevice.print(", Speed: ");
+            SerialDevice.print(data.velocity, 4);
+            SerialDevice.print(", Course: ");
+            SerialDevice.print(data.course, 2);
+            SerialDevice.print(", Yaw: ");
+            SerialDevice.print(data.yaw, 2);
+            SerialDevice.print(", Pitch: ");
+            SerialDevice.print(data.pitch, 2);
+            SerialDevice.print(", Roll: ");
+            SerialDevice.print(data.roll, 2);
+            SerialDevice.print(", NRF: ");
+            SerialDevice.print(data.nrf);
+            SerialDevice.print(", sonic: ");
+            SerialDevice.print(data.sonic);
+            SerialDevice.print(", volt: ");
+            SerialDevice.print(data.volt, 2);
+            SerialDevice.print(", PWML: ");
+            SerialDevice.print(data.pwml);
+            SerialDevice.print(", PWMR: ");
+            SerialDevice.print(data.pwmr);
+            SerialDevice.print(">");
         }
     }
 };

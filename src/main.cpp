@@ -1,7 +1,7 @@
 #include "main.hpp"
 
 void timerCallback() {
-    bool rslt = radioTX(dataToNRFStruct);
+    newDataToNRF = true;
 }
 
 void setup() {
@@ -11,14 +11,17 @@ void setup() {
     Wire.begin();
     Wire.setClock(400000);
 
-    radioSetup();
+    
     initESC();
     gimbalSetup();
     gpsSetup();
     // adsSetup(&Wire);
     // ultrasonicSetup();
-    imuSetup(&Wire);
 
+    radioSetup();
+
+    imuSetup(&Wire);
+    
     timer->setOverflow(5, HERTZ_FORMAT);
     timer->attachInterrupt(timerCallback);
     timer->resume();
@@ -40,7 +43,7 @@ void loop() {
     dataToPcStruct.yaw = imuData[0];
     dataToPcStruct.pitch = imuData[1];
     dataToPcStruct.roll = imuData[2];
-    dataToPcStruct.calibration = imuData[4];
+    dataToPcStruct.calibration = imuData[3];
 
     dataToPcStruct.lat = gpsData[0];
     dataToPcStruct.lon = gpsData[1];
@@ -77,7 +80,7 @@ void loop() {
         dataToPcStruct.nrf = "nrf"; // Normal
     }
 
-    serialCom.replyToPC(dataToPcStruct); 
+    serialCom.replyToPC(dataToPcStruct);
 
     // Data To NRF
     dataToNRFStruct.lat = dataToPcStruct.lat;
@@ -88,4 +91,7 @@ void loop() {
     dataToNRFStruct.battery = dataToPcStruct.volt;
     dataToNRFStruct.sonic = dataToPcStruct.sonic;
     dataToNRFStruct.calibration = dataToPcStruct.calibration;
+
+    getRadioData();
+    sendDataToNRF();
 }

@@ -22,10 +22,14 @@ char TXdata[32];
 String temp_string = "";
 bool waiting_for_second_part = false;
 
-void getRadioData();
+bool newDataFromNRF = false;
+
+void newRadioData();
 
 void radioSetup() {
   radio.begin();
+
+  radio.setChannel(125);
 
   radio.setDataRate(RF24_250KBPS);
   radio.setPALevel(RF24_PA_HIGH);
@@ -34,8 +38,10 @@ void radioSetup() {
   radio.openReadingPipe(1, Address[1]);
 
   radio.maskIRQ(1, 1, 0);
-  attachInterrupt(IRQ_PIN , getRadioData, FALLING);
+  attachInterrupt(IRQ_PIN , newRadioData, FALLING);
+
   radio.startListening();
+  delayMicroseconds(50);
 }
 
 bool radioTX(dataToNRF dataToNRFStruct) {
@@ -132,11 +138,17 @@ String processString(String message) {
   return "";
 }
 
-void getRadioData() {
-    String readData;
+void newRadioData() {
+  newDataFromNRF = true;
+}
 
-    if (radio.available()) {    
+void getRadioData() {
+    if (radio.available() && newDataFromNRF) {    
         radio.read(&RXdata, sizeof(RXdata));
+
+        newDataFromNRF = false;
+        String readData;
+
         readData = processString(String(RXdata));
 
         if(readData.length() > 0) {
