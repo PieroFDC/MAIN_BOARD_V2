@@ -13,6 +13,8 @@
 
 const byte Address[2][5] = {{ 0xAB, 0x8F, 0xDE, 0x9C, 0x37 }, { 0xAB, 0x8F, 0xDE, 0x9C, 0x38 }};
 
+unsigned long lastNRFMessageTime = 0;
+const unsigned long NRFtimeout = 1500;
 
 RF24 radio(CE_PIN, CSN_PIN);
 
@@ -32,7 +34,7 @@ void radioSetup() {
   radio.setChannel(125);
 
   radio.setDataRate(RF24_250KBPS);
-  radio.setPALevel(RF24_PA_HIGH);
+  radio.setPALevel(RF24_PA_MAX);
 
   radio.openWritingPipe(Address[0]);
   radio.openReadingPipe(1, Address[1]);
@@ -143,19 +145,21 @@ void newRadioData() {
 }
 
 void getRadioData() {
-    if (radio.available() && newDataFromNRF) {    
-        radio.read(&RXdata, sizeof(RXdata));
+  if (radio.available() && newDataFromNRF) {    
+    radio.read(&RXdata, sizeof(RXdata));
 
-        newDataFromNRF = false;
-        String readData;
+    newDataFromNRF = false;
+    String readData;
 
-        readData = processString(String(RXdata));
+    readData = processString(String(RXdata));
 
-        if(readData.length() > 0) {
-            parseData(readData.c_str(), dataFromNRFStruct);
-            Serial.println("data received from nrf");
-        }
+    if(readData.length() > 0) {
+        parseData(readData.c_str(), dataFromNRFStruct);
+        Serial.println("data received from nrf");
     }
+
+    lastNRFMessageTime = millis();
+  }
 }
 
 #endif //__NRF24COM_HPP

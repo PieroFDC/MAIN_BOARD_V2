@@ -23,6 +23,7 @@ struct dataFromPc {
   int fl;
   int fr;
   double gimbalyaw;
+  int numWaypoint = 0;
   String nrf;
 };
 

@@ -33,6 +33,9 @@ private:
         strtokIndx = strtok(NULL, ",");
         dataParse.gimbalyaw = atof(strtokIndx);
 
+        strtokIndx = strtok(inputBuffer, ",");
+        dataParse.numWaypoint = atoi(strtokIndx);
+
         strtokIndx = strtok(NULL, ",");
         dataParse.nrf = String(strtokIndx);
 

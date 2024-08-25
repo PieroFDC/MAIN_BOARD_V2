@@ -3,7 +3,7 @@
 
 #include "data.hpp"
 
-dataFromPc dataFromPcStruct = {1500, 1500, 78.0, "nrf"};
+dataFromPc dataFromPcStruct = {1500, 1500, 78.0, 0, "nrf"};
 dataToPc dataToPcStruct = {-999.0, -999.0, -999.0, -999.0, -999.0, -999.0, -999.0, 0, "", 0, 0, 1500, 1500};
 
 dataFromNRF dataFromNRFStruct = {0, 1500, 1500, 0, 0};

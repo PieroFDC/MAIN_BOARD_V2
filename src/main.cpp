@@ -16,7 +16,7 @@ void setup() {
     gimbalSetup();
     gpsSetup();
     // adsSetup(&Wire);
-    // ultrasonicSetup();
+    ultrasonicSetup();
 
     radioSetup();
 
@@ -28,14 +28,10 @@ void setup() {
 }
 
 void loop() {
-    // ultrasonic Handle
-    // double sonic_read = ultrasonicRead();
-    // dataToPcStruct.sonic = ...;
-    dataToPcStruct.sonic = false;
+    dataToPcStruct.sonic = checkContainer();
 
-    // Voltage Handle
     // dataToPcStruct.volt = adsRead();
-    dataToPcStruct.volt = 12.5;
+    dataToPcStruct.volt = 14.2;
 
     imuData = imuRead();
     gpsData = gpsRead();
@@ -61,7 +57,7 @@ void loop() {
 
     gimbalLoop(dataFromPcStruct.gimbalyaw, dataToPcStruct.pitch, dataToPcStruct.roll);
 
-    if(dataFromNRFStruct.startStop) {
+    if(dataFromNRFStruct.startStop && millis() - lastNRFMessageTime < NRFtimeout) {
         if(dataFromNRFStruct.mode) {
             escFeedback = writeESC(dataFromPcStruct.fl, dataFromPcStruct.fr); // Auto -> Control
         } else {
@@ -87,7 +83,7 @@ void loop() {
     dataToNRFStruct.lon = dataToPcStruct.lon;
     dataToNRFStruct.heading = dataToPcStruct.yaw;
     dataToNRFStruct.velocity = dataToPcStruct.velocity;
-    dataToNRFStruct.numWaypoints = 0; //
+    dataToNRFStruct.numWaypoints = dataFromPcStruct.numWaypoint;
     dataToNRFStruct.battery = dataToPcStruct.volt;
     dataToNRFStruct.sonic = dataToPcStruct.sonic;
     dataToNRFStruct.calibration = dataToPcStruct.calibration;
