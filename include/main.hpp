@@ -16,7 +16,7 @@
 #include "nrf24com.hpp"
 #include "utils.hpp"
 #include "ultrasonic.hpp"
-// #include "battery.hpp"
+#include "battery.hpp"
 
 bool newDataToNRF = false;
 

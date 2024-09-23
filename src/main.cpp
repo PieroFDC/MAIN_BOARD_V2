@@ -15,7 +15,7 @@ void setup() {
     initESC();
     gimbalSetup();
     gpsSetup();
-    // adsSetup(&Wire);
+    adsSetup(&Wire);
     ultrasonicSetup();
 
     radioSetup();
@@ -30,8 +30,7 @@ void setup() {
 void loop() {
     dataToPcStruct.sonic = checkContainer();
 
-    // dataToPcStruct.volt = adsRead();
-    dataToPcStruct.volt = 14.2;
+    dataToPcStruct.volt = adsRead();
 
     imuData = imuRead();
     gpsData = gpsRead();

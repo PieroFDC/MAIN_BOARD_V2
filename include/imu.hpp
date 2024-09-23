@@ -66,17 +66,17 @@ std::vector<float> imuRead() {
     unsigned long currentTime = millis();
 
     if (bno08x.wasReset()) {
-        // Serial.print("sensor was reset ");
+        Serial.print("sensor was reset ");
         setReports(reportType, reportIntervalUs);
     }
 
-    // if (currentTime - lastIMUReadTime > imuReadInterval) {
-    //     delay(500);
-    //     Serial.println(currentTime - lastIMUReadTime);
-    //     NVIC_SystemReset();
-    // }
+    if (currentTime - lastIMUReadTime > imuReadInterval) {
+        delay(500);
+        Serial.println(currentTime - lastIMUReadTime);
+        NVIC_SystemReset();
+    }
 
-    // lastIMUReadTime = currentTime;
+    lastIMUReadTime = currentTime;
 
     if (bno08x.getSensorEvent(&sensorValue)) {
         quaternionToEuler(&sensorValue.un.rotationVector, &ypr, true);
